@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<!--
+  Clubcultuurscan — rapportgenerator
+  Ontwikkeld door Robert Teunissen voor de Commissie Vocational Service,
+  Rotary District 1600. Uitsluitend voor gebruik door Rotaryclubs.
+
+  Deterministisch: dezelfde invoer levert altijd hetzelfde rapport.
+  Alle verwerking gebeurt in de browser. Er wordt niets verzonden of opgeslagen.
+
+  AANPASSEN? Alles wat instelbaar is, staat in het blok CONFIG hieronder.
+  De logica daaronder hoeft niet gewijzigd te worden.
+-->
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline';
+               img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Clubcultuurscan — rapportgenerator</title>
+<style>
+:root{--rood:#c0392b;--oranje:#e07b1a;--geel:#c9a227;--groen:#2e7d32;--lijn:#d5d8dc;--tekst:#1f2933;--zacht:#5a6673}
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+     color:var(--tekst);line-height:1.55;margin:0;background:#f4f6f8}
+.wrap{max-width:860px;margin:0 auto;padding:32px 24px 80px}
+h1{font-size:1.7rem;margin:0 0 4px}
+h2{font-size:1.25rem;margin:32px 0 10px;border-bottom:2px solid var(--lijn);padding-bottom:5px}
+h3{font-size:1.05rem;margin:22px 0 6px}
+.sub{color:var(--zacht);margin:0 0 24px}
+.paneel{background:#fff;border:1px solid var(--lijn);border-radius:8px;padding:20px;margin-bottom:20px}
+label{display:block;font-weight:600;margin:12px 0 4px;font-size:.92rem}
+input[type=text],input[type=number]{width:100%;padding:8px 10px;border:1px solid var(--lijn);
+     border-radius:5px;font-size:1rem;font-family:inherit}
+button{background:#17458f;color:#fff;border:0;border-radius:5px;padding:10px 18px;
+     font-size:1rem;font-family:inherit;cursor:pointer;margin-right:8px}
+button:disabled{background:#9aa5b1;cursor:not-allowed}
+button.zacht{background:#fff;color:#17458f;border:1px solid #17458f}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.93rem}
+th,td{border:1px solid var(--lijn);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#eef1f4;font-weight:600}
+td.num{text-align:right;white-space:nowrap}
+.rood{color:var(--rood);font-weight:600}
+.oranje{color:var(--oranje);font-weight:600}
+.geel{color:var(--geel);font-weight:600}
+.groen{color:var(--groen);font-weight:600}
+.waarschuwing{background:#fdf3e3;border-left:4px solid var(--oranje);padding:12px 14px;margin:14px 0;border-radius:0 5px 5px 0}
+.fout{background:#fdecea;border-left:4px solid var(--rood);padding:12px 14px;margin:14px 0;border-radius:0 5px 5px 0}
+.citaat{margin:0 0 6px;padding-left:12px;border-left:3px solid var(--lijn);color:#33414f}
+.duiding{margin:8px 0}
+.gss{margin:6px 0 0;font-size:.94rem}
+.gss b{display:inline-block;min-width:74px}
+.voet{margin-top:40px;padding-top:14px;border-top:1px solid var(--lijn);
+     font-size:.82rem;color:var(--zacht)}
+.verborgen{display:none}
+.stap{margin:26px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--lijn);
+     font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:#17458f}
+.stap:first-child{margin-top:0}
+.verplicht{font-weight:400;font-size:.78rem;color:var(--zacht)}
+.hulp{background:#eef3fa;border-radius:6px;padding:12px 16px;margin:10px 0 14px;font-size:.9rem}
+.hulp ol{margin:6px 0 0;padding-left:20px}
+.hulp li{margin-bottom:4px}
+.dropzone{border:2px dashed #b6c2d1;border-radius:8px;padding:18px;text-align:center;
+     background:#fafbfc;transition:border-color .15s,background .15s}
+.dropzone.over{border-color:#17458f;background:#eef3fa}
+.dropzone p{margin:4px 0}
+.knopbestand{display:inline-block;background:#fff;color:#17458f;border:1px solid #17458f;
+     border-radius:5px;padding:8px 16px;font-size:.95rem;font-weight:600;cursor:pointer;margin:6px 0}
+.klein{font-size:.86rem;color:var(--zacht)}
+.status{margin-top:10px;font-size:.9rem;color:var(--zacht)}
+.gereed{color:var(--groen);font-weight:600}
+.rollen{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+@media(max-width:700px){.rollen{grid-template-columns:1fr}}
+.rol{background:#fff;border:1px solid var(--lijn);border-radius:8px;padding:16px 18px}
+.rol h4{margin:0 0 2px;font-size:1rem}
+.rol .wie{margin:0 0 10px;font-size:.82rem;color:var(--zacht);
+     text-transform:uppercase;letter-spacing:.05em}
+.rol ol{margin:0;padding-left:20px;font-size:.92rem}
+.rol ol li{margin-bottom:6px}
+.gerust{background:#eaf5ec;border-left:4px solid var(--groen);padding:10px 14px;
+     margin:10px 0 0;border-radius:0 5px 5px 0;font-size:.9rem}
+.gerust ul{margin:6px 0 0;padding-left:18px}
+details{margin:12px 0;border:1px solid var(--lijn);border-radius:6px;background:#fff}
+summary{cursor:pointer;padding:11px 16px;font-weight:600;font-size:.94rem}
+details[open] summary{border-bottom:1px solid var(--lijn)}
+.detailinhoud{padding:14px 16px}
+textarea{width:100%;padding:10px;border:1px solid var(--lijn);border-radius:5px;
+     font-family:inherit;font-size:.88rem;line-height:1.5;resize:vertical}
+#plakveld{min-height:120px}
+#mailtekst{min-height:230px}
+.ofwel{text-align:center;margin:16px 0 10px;font-size:.86rem;color:var(--zacht);
+     text-transform:uppercase;letter-spacing:.06em}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0}
+  .geenprint{display:none!important}
+  h2,h3{page-break-after:avoid}
+  table{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="geenprint" id="invoer">
+  <h1>Clubcultuurscan — rapportgenerator</h1>
+  <p class="sub">Deze pagina maakt van de antwoorden op de clubcultuurscan een rapport voor
+     het bestuur. Alle verwerking gebeurt in deze browser: er wordt niets verzonden en niets
+     opgeslagen. U kunt de wifi uitzetten en het werkt nog steeds.</p>
+
+  <div class="paneel">
+    <h3 class="stap">Hoe werkt de clubcultuurscan?</h3>
+    <p style="margin-top:0">Er zijn twee rollen. Vrijwel alle leden hebben alleen met de
+       linkerkolom te maken.</p>
+
+    <div class="rollen">
+      <div class="rol">
+        <h4>De vragenlijst invullen</h4>
+        <p class="wie">Ieder lid · ongeveer 10 minuten</p>
+        <ol>
+          <li>U ontvangt een e-mail van uw club met een link.</li>
+          <li>U klikt op die link. De vragenlijst opent vanzelf in uw browser — op telefoon,
+              tablet of computer.</li>
+          <li>U beantwoordt 16 stellingen op een schaal van 1 tot 7, en een aantal open vragen.</li>
+          <li>Onderaan klikt u op <b>Verzenden</b>. Daarmee bent u klaar.</li>
+        </ol>
+        <div class="gerust">
+          <b>Als lid hoeft u niets te installeren of te bewaren.</b>
+          <ul>
+            <li>Geen account, geen inloggen, geen wachtwoord.</li>
+            <li>Geen bestand om te downloaden of op te slaan.</li>
+            <li>Uw naam en e-mailadres worden niet gevraagd; de antwoorden zijn anoniem.</li>
+            <li>Vul het wel in één keer in: sluit u het venster tussentijds, dan zijn uw
+                antwoorden weg en moet u opnieuw beginnen.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="rol">
+        <h4>De scan uitvoeren</h4>
+        <p class="wie">Eén contactpersoon per club</p>
+        <ol>
+          <li>Vraag de vragenlijst aan bij de commissie. U krijgt een link naar het formulier
+              en naar deze pagina.</li>
+          <li>Open die link, klik rechtsboven op de drie puntjes <b>⋮</b> en kies
+              <b>Een kopie maken</b>. Zet de naam van uw club in de titel.</li>
+          <li>Klik rechtsboven op <b>Verzenden</b>, kies het ketting-icoon <b>🔗</b> en
+              klik op <b>Kopiëren</b>. Dat is de link voor de leden.</li>
+          <li>Mail die link naar alle leden met een sluitingsdatum — gebruik desgewenst de
+              voorbeeldtekst hieronder — en stuur een week vóór sluiting één herinnering.</li>
+          <li>Open na sluiting uw formulier, klik op het tabblad <b>Reacties</b> en daarna op
+              het groene spreadsheet-icoon. De antwoorden openen in Google Spreadsheets.</li>
+          <li>Neem de antwoorden over in stap 2 hieronder en maak het rapport.</li>
+        </ol>
+        <p class="klein" style="margin-bottom:0">De antwoorden komen terecht in het
+           Google-account van uw eigen club. De commissie ziet ze niet.</p>
+      </div>
+    </div>
+
+    <details>
+      <summary>Voorbeeldtekst voor de uitnodigingsmail aan de leden</summary>
+      <div class="detailinhoud">
+        <p class="klein" style="margin-top:0">Vervang de delen tussen haken en verstuur vanaf
+           het bekende clubadres — leden openen een mail van een bekende afzender eerder.</p>
+        <textarea id="mailtekst" readonly>Onderwerp: Vul jij de clubcultuurscan in? (10 minuten, anoniem)
+
+Beste leden,
+
+Wij willen graag weten hoe jullie onze club ervaren: wat goed gaat, en waar we
+elkaar kunnen versterken. Daarvoor gebruiken we de clubcultuurscan van de
+commissie Vocational Service van district 1600.
+
+Meedoen kost ongeveer tien minuten:
+
+   [LINK VAN HET FORMULIER HIER PLAKKEN]
+
+Klik op de link, beantwoord de vragen en klik onderaan op Verzenden. Meer is
+het niet. Je hoeft niet in te loggen, niets te downloaden en niets op te slaan.
+
+De vragenlijst is anoniem. Er wordt niet gevraagd naar je naam of e-mailadres,
+en niemand kan zien wie wat heeft ingevuld. Vul de lijst wel in één keer in:
+sluit je het venster tussendoor, dan moet je opnieuw beginnen.
+
+Graag invullen vóór [DATUM].
+
+De uitkomsten bespreken we met elkaar op [DATUM CLUBAVOND]. Hoe meer leden
+meedoen, hoe bruikbaarder het beeld — juist ook als je vindt dat het goed gaat.
+
+Met vriendelijke groet,
+
+[NAAM]
+[FUNCTIE], Rotaryclub [CLUBNAAM]</textarea>
+        <p><button type="button" class="zacht" id="kopieerMail">Tekst kopiëren</button>
+           <span class="klein" id="kopieerMelding"></span></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="paneel">
+
+    <h3 class="stap">Stap 1 — Gegevens van de club</h3>
+
+    <label for="clubnaam">Naam van de club <span class="verplicht">— verplicht</span></label>
+    <input type="text" id="clubnaam" placeholder="bijvoorbeeld: Rotaryclub Voorburg">
+
+    <label for="district">District</label>
+    <input type="text" id="district" value="1600">
+
+    <label for="ledental">Totaal aantal leden <span class="verplicht">— aanbevolen</span></label>
+    <input type="number" id="ledental" min="1" placeholder="bijvoorbeeld: 40">
+    <p class="klein" style="margin-top:5px">Nodig om het responspercentage te berekenen.
+       Zonder dit getal verschijnt het rapport wel, maar zonder oordeel over de
+       representativiteit.</p>
+
+    <h3 class="stap">Stap 2 — Antwoorden overnemen</h3>
+
+    <div class="hulp">
+      <b>De eenvoudigste manier: kopiëren en plakken.</b>
+      <ol>
+        <li>Open het antwoorden-spreadsheet (formulier → tabblad <b>Reacties</b> → groen
+            spreadsheet-icoon).</li>
+        <li>Klik één keer in vakje <b>A1</b>, linksboven.</li>
+        <li>Druk <b>Cmd+A</b> (Mac) of <b>Ctrl+A</b> (Windows) — alles wordt geselecteerd.</li>
+        <li>Druk <b>Cmd+C</b> of <b>Ctrl+C</b> om te kopiëren.</li>
+        <li>Klik hieronder in het grote vak en druk <b>Cmd+V</b> of <b>Ctrl+V</b> om te plakken.</li>
+      </ol>
+    </div>
+
+    <textarea id="plakveld" placeholder="Plak hier de gekopieerde antwoorden…"></textarea>
+    <p class="klein" id="plakmelding" style="margin-top:6px"></p>
+
+    <p class="ofwel">— of —</p>
+
+    <div class="dropzone" id="dropzone">
+      <p><b>Sleep een CSV-bestand hierheen</b></p>
+      <p class="klein">voor wie liever met een gedownload bestand werkt</p>
+      <label for="bestand" class="knopbestand">Bestand kiezen…</label>
+      <input type="file" id="bestand" accept=".csv,text/csv" hidden>
+      <p class="klein" id="bestandsnaam">Nog geen bestand gekozen</p>
+    </div>
+
+    <h3 class="stap">Stap 3 — Rapport maken</h3>
+
+    <p><button id="genereer" disabled>Rapport genereren</button></p>
+    <p class="status" id="status">Vul de naam van de club in en plak de antwoorden.</p>
+    <div id="meldingen"></div>
+  </div>
+</div>
+
+<div id="acties" class="paneel geenprint verborgen">
+  <button onclick="window.print()">Afdrukken / opslaan als PDF</button>
+  <button class="zacht" id="downloadWord">Downloaden als Word</button>
+  <button class="zacht" onclick="location.reload()">Opnieuw beginnen</button>
+</div>
+
+<div id="rapport"></div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CONFIG — alles wat instelbaar is staat hier. Daaronder niets wijzigen.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const CONFIG = {
+
+  versie: "1.0-concept",
+  instrument: "Clubcultuurscan v3 (oktober 2025)",
+  contact: "[commissie-adres]",
+  attributie: "Clubcultuurscan — ontwikkeld door Robert Teunissen voor de Commissie " +
+              "Vocational Service, Rotary District 1600. Uitsluitend voor gebruik door Rotaryclubs.",
+
+  /* Banden: ondergrens inclusief, bovengrens exclusief. Schaal 1–7, midden = 4. */
+  banden: [
+    { tot: 4.0,      sleutel: "rood",   teken: "\u{1F534}", label: "Zorgpunt" },
+    { tot: 5.0,      sleutel: "oranje", teken: "\u{1F7E0}", label: "Zwak"     },
+    { tot: 6.0,      sleutel: "geel",   teken: "\u{1F7E1}", label: "Redelijk" },
+    { tot: Infinity, sleutel: "groen",  teken: "\u{1F7E2}", label: "Sterk"    }
+  ],
+
+  aantalPrioriteiten: 3,      // drie laagste items
+  prioriteitDrempel: 4.0,     // plus elk item hieronder
+  sterkteDrempel:    6.0,     // sterke punten vanaf
+  lageScore:         3,       // "aantal leden met score ≤ 3"
+
+  minRespondenten:      8,    // hieronder: waarschuwing
+  minResponspercentage: 40,   // hieronder: waarschuwing
+  minVoorCitaten:       5,    // hieronder: geen citaten in het rapport
+
+  themas: [
+    "Veilige verenigingscultuur",
+    "Kernwaarden-beleving",
+    "Leiderschap & besluitvorming",
+    "Gelijkheid & inclusie",
+    "Werving, zichtbaarheid & trots",
+    "Verandering & belemmeringen"
+  ],
+
+  /* Elk item telt bij precies één thema. */
+  items: [
+    { nr:1,  thema:"Veilige verenigingscultuur",     kort:"Veilig kritiek uiten",
+      tekst:"In onze club voelen leden zich veilig om kritiek te uiten." },
+    { nr:2,  thema:"Verandering & belemmeringen",    kort:"Initiatieven positief ontvangen",
+      tekst:"Nieuwe initiatieven worden positief ontvangen, ongeacht wie ze aandraagt." },
+    { nr:3,  thema:"Kernwaarden-beleving",           kort:"Gezelligheid en impact combineren",
+      tekst:"We combineren gezelligheid met maatschappelijke impact." },
+    { nr:4,  thema:"Leiderschap & besluitvorming",   kort:"Verbindend leiderschap",
+      tekst:"Leiderschap in onze club is verbindend." },
+    { nr:5,  thema:"Leiderschap & besluitvorming",   kort:"Richtinggevend leiderschap",
+      tekst:"Leiderschap in onze club is richtinggevend." },
+    { nr:6,  thema:"Werving, zichtbaarheid & trots", kort:"Trots op maatschappelijke bijdrage",
+      tekst:"We zijn als club trots op onze bijdrage aan de samenleving." },
+    { nr:7,  thema:"Veilige verenigingscultuur",     kort:"Spanningen open bespreken",
+      tekst:"We bespreken spanningen of conflicten op een open en constructieve manier." },
+    { nr:8,  thema:"Leiderschap & besluitvorming",   kort:"Vertrouwen in het bestuur",
+      tekst:"Ik vertrouw erop dat het bestuur beslissingen neemt in het belang van de hele club." },
+    { nr:9,  thema:"Gelijkheid & inclusie",          kort:"Gelijke kansen om mee te doen",
+      tekst:"Iedereen in onze club krijgt gelijke kansen om mee te doen aan projecten en initiatieven." },
+    { nr:10, thema:"Gelijkheid & inclusie",          kort:"Open en gastvrij",
+      tekst:"Onze club is open en gastvrij voor mensen met verschillende achtergronden, leeftijden en perspectieven." },
+    { nr:11, thema:"Leiderschap & besluitvorming",   kort:"Helderheid over besluitvorming",
+      tekst:"Het is voor mij duidelijk hoe beslissingen binnen het bestuur tot stand komen en gecommuniceerd worden." },
+    { nr:12, thema:"Werving, zichtbaarheid & trots", kort:"Nieuwe leden aandragen",
+      tekst:"De leden van onze club dragen regelmatig potentiële nieuwe leden aan." },
+    { nr:13, thema:"Kernwaarden-beleving",           kort:"Aandacht voor morele dilemma's",
+      tekst:"We besteden voldoende aandacht aan hoe effectief om te gaan met morele dilemma's." },
+    { nr:14, thema:"Werving, zichtbaarheid & trots", kort:"Actief op social media",
+      tekst:"We zijn actief op social media om te laten zien wat onze club bijdraagt aan de samenleving." },
+    { nr:15, thema:"Kernwaarden-beleving",           kort:"Vriendschap en vertrouwen",
+      tekst:"We werken actief aan het bevorderen van vriendschap en vertrouwen binnen de club." },
+    { nr:16, thema:"Verandering & belemmeringen",    kort:"Netwerk willen inzetten",
+      tekst:"We zijn bereid ons netwerk in te zetten als dat gevraagd wordt." }
+  ],
+
+  /* Toewijzing van open vragen aan thema's, op trefwoord in de vraagtekst.
+     Geen match: "Overige open antwoorden". Trefwoorden in kleine letters. */
+  openVragen: [
+    { thema:"Veilige verenigingscultuur",     trefwoorden:["veilig","conflict","spanning","kritiek"] },
+    { thema:"Kernwaarden-beleving",           trefwoorden:["waarde","trots","moreel","ethiek","vriendschap"] },
+    { thema:"Leiderschap & besluitvorming",   trefwoorden:["bestuur","besluit","leiderschap","koers"] },
+    { thema:"Gelijkheid & inclusie",          trefwoorden:["inclusie","gelijk","gastvrij","welkom"] },
+    { thema:"Werving, zichtbaarheid & trots", trefwoorden:["werving","zichtbaar","social media","imago","buiten"] },
+    { thema:"Verandering & belemmeringen",    trefwoorden:["verander","belemmer","toekomst","ideaal","verbeter","droom"] }
+  ],
+
+  negeerKolommen: ["tijdstempel","timestamp","datum","score"],
+  emailAanduidingen: ["e-mail","email","mailadres","e-mailadres"],
+
+  /* ── DUIDINGBIBLIOTHEEK ────────────────────────────────────────────────
+     24 ingangen: zes thema's × vier banden.
+     Concept — nog te herschrijven in eigen stem. Structuur ligt vast. */
+  duiding: {
+
+    "Veilige verenigingscultuur": {
+      rood: {
+        duiding:"Leden ervaren te weinig ruimte om spanningen te benoemen. Dat betekent niet dat er veel conflicten zijn, maar dat er geen gebaande weg is om ze te bespreken. Ongenoegen verdwijnt daarmee niet; het gaat ondergronds en komt later en scherper terug. Dit thema vraagt een apart traject onder regie van het bestuur, met een neutrale gespreksleider en eigen tijd. Behandel het niet op een gewone clubavond — die is gebaat bij vooruitkijken, terwijl dit onderwerp zorgvuldigheid nodig heeft.",
+        gedrag:"Misverstanden benoemen zonder verwijt, en “ik zie het anders” rustig kunnen zeggen zonder dat het als aanval landt.",
+        systeem:"Een korte, feitelijke evaluatie wanneer iets schuurt — binnen twee weken, gestructureerd, niet emotioneel.",
+        symbool:"Spreekkaartjes op tafel: “Eén persoon spreekt tegelijk” en “Check je aannames”." },
+      oranje: {
+        duiding:"De sfeer is open genoeg voor het alledaagse, maar zodra een onderwerp spannend wordt, valt het gesprek stil. Leden merken dat wel op, maar niemand voelt zich geroepen het te benoemen. Het risico is niet escalatie maar erosie: mensen haken stilletjes af zonder dat iemand kan aanwijzen waarom.",
+        gedrag:"Actief luisteren en samenvatten — “wat ik je hoor zeggen is…” — zodat iemand die iets moeilijks inbrengt merkt dat het is aangekomen.",
+        systeem:"Bij commissie- en clubavonden: één persoon leidt het gesprek, één persoon bewaakt de structuur.",
+        symbool:"Een vaste, korte check-in aan het begin van elke commissievergadering." },
+      geel: {
+        duiding:"Er wordt gesproken over wat er speelt, en leden ervaren daar ruimte voor. De kwetsbaarheid zit in de afhankelijkheid van personen: het werkt omdat een paar leden die rol vanzelf pakken. Bij een bestuurswissel of hun vertrek kan het snel wegvallen. De opgave is het van gewoonte tot werkwijze te maken.",
+        gedrag:"Aangeven wat je nodig hebt om je prettig te voelen, in plaats van er omheen praten.",
+        systeem:"Maandelijks een korte check: wat gaat goed, wat kan beter. Kort genoeg om vol te houden.",
+        symbool:"Het bestuur benoemt hardop wanneer een lastig punt goed is besproken, zodat zichtbaar wordt dat het mag." },
+      groen: {
+        duiding:"Leden ervaren de club als een plek waar je kunt zeggen wat je denkt. Dat is zeldzaam en het is de basis onder alle andere thema's: zonder deze veiligheid komen kritische signalen nergens boven water. De opgave is niet verbeteren maar doorgeven — aan nieuwe leden en aan een volgend bestuur.",
+        gedrag:"Ervaren leden gaan voor in kwetsbaarheid: als zij twijfel uitspreken, mogen anderen dat ook.",
+        systeem:"Bij de introductie van nieuwe leden expliciet benoemen hoe in deze club met meningsverschillen wordt omgegaan.",
+        symbool:"Een grote poster met de clubwaarden zichtbaar in de zaal, met psychologische veiligheid daar expliciet bij genoemd." }
+    },
+
+    "Kernwaarden-beleving": {
+      rood: {
+        duiding:"De waarden van de club zijn voor leden abstract gebleven. Men weet wat er op papier staat, maar het gesprek over het waarom wordt zelden gevoerd. Daardoor voelt clubwerk aan als een agenda van activiteiten in plaats van als iets met richting. Dat raakt vooral de betrokkenheid van leden die juist voor de inhoud kwamen.",
+        gedrag:"Bij elk project hardop de vraag stellen: waarom doen we dit, en wat zegt dat over wat wij belangrijk vinden?",
+        systeem:"Jaarlijks per commissie een kort overleg over rol, doelen en de waarde die eraan ten grondslag ligt.",
+        symbool:"De clubwaarden zichtbaar in de zaal, niet in een map." },
+      oranje: {
+        duiding:"Leden herkennen de waarden en onderschrijven ze, maar ze komen zelden ter sprake. Waarden die niet besproken worden, worden decoratie: ze staan op de website en spelen geen rol bij keuzes. De morele kant van het clubwerk — waar wringt iets, wat vinden we hier eigenlijk van — blijft daardoor onbenut.",
+        gedrag:"Open zijn over twijfels en verwachtingen in plaats van aannames doen over wat anderen wel zullen vinden.",
+        systeem:"Eén keer per jaar een clubavond met een moreel dilemma uit het beroepsleven van leden als onderwerp.",
+        symbool:"Bij de opening van een project kort benoemen welke waarde eraan ten grondslag ligt." },
+      geel: {
+        duiding:"De waarden leven merkbaar: er is vriendschap, en het besef dat de club ergens voor staat. Wat nog ontbreekt is de expliciete morele verdieping — het gesprek over wat goed handelen betekent, waar Rotary van oudsher sterk in is. Dat is geen tekort maar een kans, en juist deze club heeft er de basis voor.",
+        gedrag:"Benoemen wat je waardeert in de bijdrage van een ander, en waarom dat past bij wat de club wil zijn.",
+        systeem:"De 4-vragentest niet als traditie noemen maar als werkvorm gebruiken bij een reëel besluit.",
+        symbool:"Een vast moment in het jaar waarop de club terugkijkt op de eigen maatschappelijke bijdrage." },
+      groen: {
+        duiding:"Leden ervaren de waarden als richtinggevend, niet als formaliteit. Dat is het fundament waarop werving, binding en maatschappelijke inzet rusten, en het verklaart doorgaans ook hoge scores elders. De opgave is behoud: waardenbeleving is de eerste die verwatert bij snelle groei of een reeks drukke jaren.",
+        gedrag:"Nieuwe leden vanaf dag één betrekken bij het gesprek over het waarom, niet alleen bij de uitvoering.",
+        systeem:"Bij elk nieuw project vastleggen aan welke waarde het bijdraagt.",
+        symbool:"Verhalen van leden over wat de club voor hen betekent, structureel gedeeld in de nieuwsbrief." }
+    },
+
+    "Leiderschap & besluitvorming": {
+      rood: {
+        duiding:"Leden weten niet hoe besluiten tot stand komen. Let op het onderscheid met vertrouwen: een club kan het bestuur volledig vertrouwen en tegelijk geen idee hebben hoe er wordt besloten. Het tweede is een procesprobleem, geen vertrouwenskwestie, en daarmee goed op te lossen — vaak binnen enkele maanden.",
+        gedrag:"Toegeven wanneer een besluit anders had gemoeten, in plaats van het te verdedigen.",
+        systeem:"Elk besluit schriftelijk samenvatten in één alinea: wat, waarom, door wie, wanneer.",
+        symbool:"Een besluitenbord op elke clubavond met drie rubrieken: besloten, lopend, in voorbereiding." },
+      oranje: {
+        duiding:"Het bestuur wordt als integer en benaderbaar ervaren, maar leden missen richting en terugkoppeling. Besluiten bereiken de club vaak achteraf en zonder toelichting. Dat kost geen vertrouwen, wel betrokkenheid: wie niet weet wat er speelt, kan ook niet meedoen.",
+        gedrag:"Afspraken nakomen, of tijdig laten weten dat iets niet lukt.",
+        systeem:"Notulen binnen 48 uur delen, ook als ze kort zijn.",
+        symbool:"Commissies geven per clubavond een update van zestig seconden." },
+      geel: {
+        duiding:"Leden ervaren het bestuur als betrouwbaar en de koers als navolgbaar. De aandacht mag nu naar bestendiging: werkt dit doordat de huidige bestuursleden het goed doen, of doordat de club het zo geregeld heeft? Alleen het tweede overleeft een wissel.",
+        gedrag:"Bestuursleden betrekken leden vooraf bij keuzes, niet pas bij de uitvoering.",
+        systeem:"Een vaste overdrachtsnotitie per bestuursfunctie.",
+        symbool:"Bij aanvang van het jaar een eenvoudig jaarplan op één pagina, voor iedereen zichtbaar." },
+      groen: {
+        duiding:"Vertrouwen in het bestuur en helderheid over besluiten gaan hier samen. Dat is bestuurlijk kapitaal: een club met deze score kan ingrijpende keuzes maken zonder dat het draagvlak wegvalt. Zet dat kapitaal in voor de thema's die lager scoren, in plaats van het onbenut te laten.",
+        gedrag:"Het bestuur vraagt actief naar tegengeluid en beloont het zichtbaar.",
+        systeem:"Rouleren van commissietaken, zodat kennis en invloed niet vastlopen bij dezelfde leden.",
+        symbool:"Het bestuur zit verspreid door de zaal, niet aan een eigen tafel." }
+    },
+
+    "Gelijkheid & inclusie": {
+      rood: {
+        duiding:"Leden ervaren dat meedoen afhangt van wie je kent. Er zijn waarschijnlijk geen expliciete drempels, maar de informele route naar betrokkenheid loopt via bestaande contacten — en wie daar niet in zit, blijft buiten beeld. Dit raakt vrijwel altijd nieuwe leden en leden die minder vaak aanwezig zijn.",
+        gedrag:"Aan tafel gaan zitten bij iemand die je nog niet goed kent.",
+        systeem:"Elk nieuw lid krijgt een buddy die drie maanden meeloopt.",
+        symbool:"Een lichte tafelschikking met een speelse aanleiding, zonder dwang." },
+      oranje: {
+        duiding:"De club is gastvrij aan de oppervlakte, maar eronder zitten subgroepen. Nieuwe leden voelen zich welkom en toch niet vanzelf onderdeel. Het verschil zit zelden in onwil; het zit in gewoontes die niemand opmerkt totdat iemand van buiten binnenkomt.",
+        gedrag:"Nieuwkomers actief betrekken in gesprekken in plaats van afwachten of ze aansluiten.",
+        systeem:"Een jaarlijkse ronde langs de tafels om nieuwe leden in commissies te plaatsen.",
+        symbool:"Een kort welkomsritueel voor nieuwe leden — geen lange speeches." },
+      geel: {
+        duiding:"De club wordt breed als open en gastvrij ervaren. De aandacht mag nu uitgaan naar wie stil blijft: gemiddelden verhullen dat een klein aantal leden een heel andere ervaring kan hebben. Kijk bij dit thema nadrukkelijk naar de spreiding, niet alleen naar het gemiddelde.",
+        gedrag:"Mensen laten uitpraten, ook wanneer het gesprek traag wordt.",
+        systeem:"Bij elke commissie ten minste één lid dat korter dan twee jaar lid is.",
+        symbool:"Een jaarlijkse clubfoto waarop iedereen staat." },
+      groen: {
+        duiding:"Gastvrijheid en gelijke kansen zijn hier geen streven maar praktijk. Dit is het visitekaartje van de club en het sterkste wervingsargument dat er is — mits mensen buiten de club ervan weten. Bekijk of deze kwaliteit ook zichtbaar is in wat de club naar buiten laat zien.",
+        gedrag:"Leden nodigen introducés uit zonder dat daar een aanleiding voor nodig is.",
+        systeem:"Een vast onboardingpad voor nieuwe leden, van kennismaking tot eerste commissietaak.",
+        symbool:"Nieuwe leden krijgen in hun eerste jaar een zichtbare rol op een clubavond." }
+    },
+
+    "Werving, zichtbaarheid & trots": {
+      rood: {
+        duiding:"De club is intern levendig maar extern vrijwel onzichtbaar. Leden zijn trots op wat er gebeurt, en tegelijk weet vrijwel niemand daarbuiten ervan. Dat kost de club tweemaal: potentiële leden zien geen reden om aan te sluiten, en leden missen de bevestiging dat hun inzet ertoe doet. Dit is een van de best oplosbare thema's — het vraagt vooral organisatie, geen cultuurverandering.",
+        gedrag:"Hardop bedanken voor inzet, ook voor kleine taken.",
+        systeem:"De communicatiecommissie maakt per kwartaal een zichtbaarheidsoverzicht.",
+        symbool:"Foto's in de nieuwsbrief met een korte toelichting: wie deed wat?" },
+      oranje: {
+        duiding:"De trots is er, de zichtbaarheid is niet georganiseerd. Wat naar buiten gaat, hangt af van wie er toevallig aan denkt. Daardoor ontstaat geen beeld bij buitenstaanders en blijft werving een kwestie van individuele contacten in plaats van herkenbaarheid.",
+        gedrag:"Nieuwe leden direct uitnodigen voor een project, zodat ze iets te vertellen hebben.",
+        systeem:"Per project één vast bedankmoment en één bericht naar buiten.",
+        symbool:"Een jaarlijks overzicht van wat de club heeft bijgedragen, gedeeld met leden én daarbuiten." },
+      geel: {
+        duiding:"De club laat zich zien en leden dragen nieuwe leden aan. De stap die resteert is van toeval naar ritme: zichtbaarheid die op een vast moment gebeurt, houdt stand wanneer de enthousiaste communicatiecommissie wisselt.",
+        gedrag:"Successen delen zonder dat het opschepperig hoeft te voelen — wat de club deed, en voor wie.",
+        systeem:"Een jaarplanning waarin per project vooraf staat wat er gedeeld wordt.",
+        symbool:"Een vast moment op elke clubavond waarop iets naar buiten toe wordt vastgelegd." },
+      groen: {
+        duiding:"Leden zijn trots, dragen actief nieuwe leden aan en de club is zichtbaar. Deze combinatie is ongebruikelijk en waardevol. Benut haar breder dan voor werving alleen: zichtbaarheid maakt het makkelijker om partners te vinden voor projecten en om andere clubs mee te krijgen.",
+        gedrag:"Leden spreken buiten de club vanzelfsprekend over wat ze er doen.",
+        systeem:"Een wervingsritme met vaste momenten in het jaar, niet ad hoc.",
+        symbool:"Een jaarlijkse open avond waarop introducés welkom zijn." }
+    },
+
+    "Verandering & belemmeringen": {
+      rood: {
+        duiding:"Initiatief stokt. Leden ervaren dat nieuwe voorstellen weerstand oproepen of stilletjes verdwijnen, en dat het altijd op dezelfde mensen aankomt. Vaak is de oorzaak niet onwil maar uitputting van een kleine groep trekkers, gecombineerd met het ontbreken van een route om een idee ergens te brengen.",
+        gedrag:"Iedereen de kans geven om input te leveren, ook wie niet snel het woord neemt.",
+        systeem:"Een vaste, lichte route voor ideeën: waar breng je het in, wie reageert, binnen welke termijn.",
+        symbool:"Kleine, zichtbare successen vieren, zodat vernieuwing niet uitsluitend met grote plannen wordt geassocieerd." },
+      oranje: {
+        duiding:"De bereidheid om mee te bewegen is er, maar de capaciteit is beperkt en hangt aan enkele leden. Vernieuwing blijft daardoor kwetsbaar: één afhaker en het plan valt stil. Lichte structuren werken hier beter dan ambitieuze plannen.",
+        gedrag:"Op tijd reageren op uitnodigingen en verzoeken, zodat trekkers weten waar ze aan toe zijn.",
+        systeem:"Maximaal drie commissieleden wisselen per jaar, zodat continuïteit behouden blijft.",
+        symbool:"Een zichtbare jaarplanning van alle projecten, zonder verrassingen." },
+      geel: {
+        duiding:"Nieuwe initiatieven krijgen ruimte en leden zijn bereid hun netwerk in te zetten. De opgave is dat te richten: bereidheid zonder focus leidt tot veel losse activiteiten en weinig zichtbaar resultaat. Kies liever twee dingen goed dan zes half.",
+        gedrag:"Bij een nieuw idee meteen vragen wie er mee wil doen, in plaats van eerst te vergaderen.",
+        systeem:"Elk project start met één overzicht: doel, rol, tijd, wie.",
+        symbool:"Bij afronding van een project kort terugkijken: wat werkte, wat nemen we mee?" },
+      groen: {
+        duiding:"De club staat open voor vernieuwing en leden zetten hun netwerk in. Dit is precies de grondstof voor vocational service: professionele expertise die beschikbaar komt voor de club en de omgeving. Weinig clubs hebben dit; de vraag is of de club het ook daadwerkelijk benut.",
+        gedrag:"Leden bieden hun expertise aan zonder dat erom gevraagd wordt.",
+        systeem:"Een eenvoudig overzicht van welke kennis en netwerken er in de club aanwezig zijn.",
+        symbool:"Bij elk project zichtbaar maken welk lid welke expertise inbracht." }
+    }
+  },
+
+  teksten: {
+    citaatInstructie: "Let op: onderstaande antwoorden zijn letterlijk overgenomen. " +
+      "De contactpersoon van de club controleert ze op namen en herleidbare details vóór verspreiding.",
+    geenSterktes: "Geen enkel item haalt de groene band (≥ 6,0). Dat betekent niet dat de club " +
+      "zwak staat, maar wel dat er nog geen uitgesproken sterkte is om op te bouwen.",
+    voorbehoud: "Dit rapport is een gespreksinstrument, geen gevalideerde psychometrische meting. " +
+      "Het beoordeelt geen individuele leden en is niet bedoeld als grondslag voor besluiten over personen."
+  },
+
+  /* ── VERVOLG: van rapport naar ledenavond ──────────────────────────────
+     Koppelt elk thema aan de kernwaarden uit "Vervolg cultuurscan deel 3",
+     zodat de subgroepen op de ledenavond met concrete waarden aan de slag
+     kunnen. Zie stap 1 van deel 2: er worden 2 tot 4 waarden gekozen. */
+
+  themaWaarden: {
+    "Veilige verenigingscultuur":     ["Openheid", "Moed"],
+    "Kernwaarden-beleving":           ["Vertrouwen"],
+    "Leiderschap & besluitvorming":   ["Vertrouwen", "Rechtvaardigheid"],
+    "Gelijkheid & inclusie":          ["Respect", "Verbinding"],
+    "Werving, zichtbaarheid & trots": ["Waardering"],
+    "Verandering & belemmeringen":    ["Verbinding", "Moed"]
+  },
+
+  vervolg: {
+    minThemas: 2,          // deel 2 werkt met 2 tot 4 waarden in subgroepen
+    maxThemas: 4,
+
+    /* Thema's die bij deze band NIET op de ledenavond thuishoren,
+       maar in een apart traject onder regie van het bestuur. */
+    apartTraject: [
+      { thema: "Veilige verenigingscultuur", banden: ["rood"],
+        reden: "Bij deze score ervaren leden te weinig ruimte om spanningen te benoemen. " +
+          "Dat onderwerp vraagt eigen tijd, een neutrale gespreksleider en regie van het " +
+          "bestuur. Op een ledenavond die vooruit wil kijken, loopt het vast in het verleden." }
+    ],
+
+    stappen: [
+      { titel: "1. Het bestuur bespreekt het rapport",
+        wie: "Bestuur · binnen twee weken",
+        tekst: "Lees het rapport samen door en stel vast welke uitkomsten herkend worden. " +
+          "Besluit welke thema's naar de ledenavond gaan en of er iets apart opgepakt moet " +
+          "worden. Spreek ook af wat er met het rapport gebeurt: wie krijgt het volledig te " +
+          "zien, en wat wordt met alle leden gedeeld?" },
+      { titel: "2. De ledenavond",
+        wie: "Alle leden · ongeveer 1 uur en 45 minuten",
+        tekst: "Een korte, lichte sessie waarin leden zelf benoemen welk gedrag, welke " +
+          "afspraken en welke zichtbare signalen bij de gekozen waarden horen. De voorzitter " +
+          "opent en sluit; twee begeleiders leiden het gesprek. De inhoud komt van de leden." },
+      { titel: "3. Terugkoppeling en herhaalmeting",
+        wie: "Bestuur · binnen een maand, daarna na ongeveer een jaar",
+        tekst: "Werk de opbrengst uit tot enkele concrete afspraken en koppel die terug aan " +
+          "de leden — anders verdampt de avond. Herhaal de scan na ongeveer een jaar met " +
+          "dezelfde vragenlijst, zodat zichtbaar wordt wat er is veranderd." }
+    ],
+
+    documenten: [
+      { naam: "Deel 1 — Mini-briefing voor de voorzitter",
+        tekst: "Wat de voorzitter zegt bij opening en afsluiting, en wat te vermijden." },
+      { naam: "Deel 2 — Mini-briefing voor de begeleiders",
+        tekst: "Draaiboek van de avond, met het A3-werkblad voor de subgroepen." },
+      { naam: "Deel 3 — Gedragsvoorbeelden",
+        tekst: "Voorbeelden van gedrag, systemen en symbolen per kernwaarde, als hulp " +
+          "wanneer een groep vastloopt." }
+    ],
+
+    slot: "De drie documenten zijn op te vragen bij de commissie Vocational Service. " +
+      "Het werkblad in deel 2 stelt dezelfde drie vragen — gedrag, afspraken, zichtbare " +
+      "signalen — die in dit rapport bij elk thema zijn benoemd. De uitkomsten van deze " +
+      "scan zijn dus de startinhoud voor de avond, niet een losse bijlage.",
+
+    /* Vast kader over gegevens en zorgvuldigheid. Bewust feitelijk geformuleerd:
+       geen belofte van absolute veiligheid, wel wat er wel en niet gebeurt. */
+    gegevens: {
+      kop: "Afspraken over de omgang met dit rapport",
+      inleiding: "De rapportgenerator verstuurt geen gegevens en slaat niets op. " +
+        "De antwoorden blijven in het Google-account van de club zelf; dit rapport is " +
+        "gemaakt op de computer van de contactpersoon. Dat is controleerbaar: de pagina " +
+        "werkt ook zonder internetverbinding. Het grootste risico zit daarom niet in de " +
+        "software, maar in wat er na vandaag met dit rapport gebeurt. Maak daarover " +
+        "vooraf vier afspraken.",
+      punten: [
+        "<b>Wie krijgt wat?</b> Spreek af wie het volledige rapport ontvangt en wat met " +
+        "alle leden wordt gedeeld. Een samenvatting voor de club en het volledige rapport " +
+        "voor het bestuur werkt in de praktijk het beste.",
+
+        "<b>Lees de open antwoorden na vóór verspreiding.</b> Er staan geen namen bij, " +
+        "maar in een kleine club is een uitspraak soms toch herleidbaar. Haal details " +
+        "weg die naar één persoon wijzen.",
+
+        "<b>Spreek een bewaartermijn af.</b> Advies: dit rapport bewaren tot na de " +
+        "herhaalmeting, zodat vergelijken mogelijk blijft. Verwijder de ruwe antwoorden " +
+        "eerder — ook het gedownloade bestand op de computer van de contactpersoon.",
+
+        "<b>Beveilig het account met de antwoorden.</b> Zet tweestapsverificatie aan op " +
+        "het Google-account waarin het formulier en de antwoorden staan, en deel het " +
+        "wachtwoord niet."
+      ],
+      slot: "Haal de rapportgenerator altijd op bij de commissie Vocational Service, en " +
+        "niet via een kopie die van club naar club wordt doorgestuurd. Alleen dan weet u " +
+        "zeker dat u met de ongewijzigde versie werkt."
+    }
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Vanaf hier: logica. Niet wijzigen zonder de specificatie bij te werken.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+  ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const fmt = n => (n === null || n === undefined || isNaN(n))
+  ? "–" : n.toFixed(2).replace(".", ",");
+
+/* ── Inlezen ──────────────────────────────────────────────────────────── */
+
+function parseCSV(tekst) {
+  tekst = tekst.replace(/^﻿/, "");
+  // Scheidingsteken bepalen: tab (geplakt uit een spreadsheet), puntkomma of komma.
+  const eerste = tekst.split("\n")[0];
+  const scheider = ["\t", ";", ","]
+    .map(s => ({ s: s, n: eerste.split(s).length }))
+    .sort((a, b) => b.n - a.n)[0].s;
+  const rijen = []; let veld = "", rij = [], inQuote = false;
+  for (let i = 0; i < tekst.length; i++) {
+    const c = tekst[i];
+    if (inQuote) {
+      if (c === '"') { if (tekst[i+1] === '"') { veld += '"'; i++; } else inQuote = false; }
+      else veld += c;
+    } else if (c === '"') inQuote = true;
+    else if (c === scheider) { rij.push(veld); veld = ""; }
+    else if (c === "\n") { rij.push(veld); rijen.push(rij); rij = []; veld = ""; }
+    else if (c !== "\r") veld += c;
+  }
+  if (veld !== "" || rij.length) { rij.push(veld); rijen.push(rij); }
+  return rijen.filter(r => r.some(v => v.trim() !== ""));
+}
+
+const normaliseer = s => String(s).toLowerCase()
+  .replace(/[^a-z0-9À-ſ ]/g, " ").replace(/\s+/g, " ").trim();
+
+function overeenkomst(a, b) {
+  const ta = new Set(normaliseer(a).split(" ").filter(w => w.length > 2));
+  const tb = new Set(normaliseer(b).split(" ").filter(w => w.length > 2));
+  if (!ta.size || !tb.size) return 0;
+  let gedeeld = 0; ta.forEach(w => { if (tb.has(w)) gedeeld++; });
+  return gedeeld / Math.min(ta.size, tb.size);
+}
+
+/* ── Analyse ──────────────────────────────────────────────────────────── */
+
+function band(waarde) {
+  return CONFIG.banden.find(b => waarde < b.tot) || CONFIG.banden[CONFIG.banden.length - 1];
+}
+
+function analyseer(rijen, ledental) {
+  const kop = rijen[0], data = rijen.slice(1);
+  const gebruikt = new Set();
+  const melding = [];
+
+  kop.forEach(k => {
+    if (CONFIG.emailAanduidingen.some(e => normaliseer(k).includes(normaliseer(e))))
+      melding.push("Het bestand bevat een kolom die op e-mailadressen lijkt (“" + k +
+        "”). De scan hoort anoniem te zijn; controleer de instellingen van het formulier.");
+  });
+
+  const items = CONFIG.items.map(item => {
+    let beste = -1, score = 0;
+    kop.forEach((k, i) => {
+      if (gebruikt.has(i)) return;
+      const s = overeenkomst(k, item.tekst);
+      if (s > score) { score = s; beste = i; }
+    });
+    const kopie = {}; for (const k in item) kopie[k] = item[k];
+    if (score < 0.5 || beste < 0) { kopie.kolom = null; return kopie; }
+    gebruikt.add(beste);
+    kopie.kolom = beste; return kopie;
+  });
+
+  const ontbreekt = items.filter(i => i.kolom === null);
+  if (ontbreekt.length)
+    return { fout: "De volgende vragen zijn niet in de antwoorden teruggevonden: " +
+      ontbreekt.map(i => "vraag " + i.nr + " (" + i.kort + ")").join(", ") +
+      ". Is het formulier aangepast? De vragenlijst moet ongewijzigd blijven." };
+
+  items.forEach(item => {
+    const w = [];
+    data.forEach(r => {
+      const ruw = (r[item.kolom] || "").trim();
+      const m = ruw.match(/-?\d+([.,]\d+)?/);
+      if (!m) return;
+      const v = parseFloat(m[0].replace(",", "."));
+      if (v >= 1 && v <= 7) w.push(v);
+    });
+    item.n = w.length;
+    item.gem = w.length ? w.reduce((a, b) => a + b, 0) / w.length : null;
+    item.min = w.length ? Math.min.apply(null, w) : null;
+    item.max = w.length ? Math.max.apply(null, w) : null;
+    item.laag = w.filter(v => v <= CONFIG.lageScore).length;
+  });
+
+  const bruikbaar = items.filter(i => i.gem !== null);
+  if (!bruikbaar.length)
+    return { fout: "Geen bruikbare antwoorden gevonden (verwacht: cijfers 1 t/m 7)." };
+
+  const respondenten = Math.max.apply(null, items.map(i => i.n));
+
+  const themas = CONFIG.themas.map(naam => {
+    const eigen = items.filter(i => i.thema === naam && i.gem !== null);
+    const gem = eigen.reduce((a, b) => a + b.gem, 0) / eigen.length;
+    return { naam: naam, items: eigen, gem: gem, band: band(gem) };
+  }).sort((a, b) => a.gem - b.gem);
+
+  const oplopend = bruikbaar.slice().sort((a, b) => a.gem - b.gem || a.nr - b.nr);
+  const prioriteiten = [];
+  oplopend.forEach((i, idx) => {
+    if (idx < CONFIG.aantalPrioriteiten || i.gem < CONFIG.prioriteitDrempel) prioriteiten.push(i);
+  });
+
+  const sterktes = bruikbaar.filter(i => i.gem >= CONFIG.sterkteDrempel)
+                            .sort((a, b) => b.gem - a.gem);
+
+  const open = {};
+  kop.forEach((k, i) => {
+    if (gebruikt.has(i)) return;
+    const nk = normaliseer(k);
+    if (!nk) return;
+    if (CONFIG.negeerKolommen.some(n => nk.startsWith(normaliseer(n)))) return;
+    if (CONFIG.emailAanduidingen.some(e => nk.includes(normaliseer(e)))) return;
+    const antw = data.map(r => (r[i] || "").trim()).filter(v => v.length > 2);
+    if (!antw.length) return;
+    const regel = CONFIG.openVragen.find(o => o.trefwoorden.some(t => nk.includes(t)));
+    const thema = regel ? regel.thema : "Overige open antwoorden";
+    (open[thema] = open[thema] || []).push({ vraag: k, antwoorden: antw });
+  });
+
+  const waarschuwingen = melding.slice();
+  const respons = ledental ? (respondenten / ledental) * 100 : null;
+  if (respondenten < CONFIG.minRespondenten)
+    waarschuwingen.push("Er zijn " + respondenten + " ingevulde reacties. Onder de " +
+      CONFIG.minRespondenten + " reacties zijn de gemiddelden gevoelig voor toeval; " +
+      "lees ze als indicatie, niet als meting.");
+  if (respons !== null && respons < CONFIG.minResponspercentage)
+    waarschuwingen.push("De respons is " + respons.toFixed(0) + "% van " + ledental +
+      " leden. Onder de " + CONFIG.minResponspercentage +
+      "% is onzeker of het beeld representatief is voor de hele club.");
+  const citatenTonen = respondenten >= CONFIG.minVoorCitaten;
+  if (!citatenTonen)
+    waarschuwingen.push("Bij minder dan " + CONFIG.minVoorCitaten +
+      " reacties zijn losse antwoorden herleidbaar tot personen. De open antwoorden " +
+      "zijn daarom niet in dit rapport opgenomen.");
+
+  return { items: items, themas: themas, prioriteiten: prioriteiten, sterktes: sterktes,
+           open: open, respondenten: respondenten, ledental: ledental, respons: respons,
+           waarschuwingen: waarschuwingen, citatenTonen: citatenTonen };
+}
+
+/* ── Rapport ──────────────────────────────────────────────────────────── */
+
+let laatste = null;
+
+/* Bepaalt welke thema's naar de ledenavond gaan en welke apart worden opgepakt.
+   Deterministisch: laagst scorende thema's eerst, met uitsluiting volgens config. */
+function vervolgIndeling(themas) {
+  const apart = [];
+  const kandidaten = [];
+  themas.forEach(t => {
+    const regel = CONFIG.vervolg.apartTraject.find(r =>
+      r.thema === t.naam && r.banden.indexOf(t.band.sleutel) !== -1);
+    if (regel) apart.push({ thema: t, reden: regel.reden });
+    else kandidaten.push(t);
+  });
+  // themas is al oplopend gesorteerd op score
+  const aandacht = kandidaten.filter(t =>
+    t.band.sleutel === "rood" || t.band.sleutel === "oranje");
+  let avond = aandacht.slice(0, CONFIG.vervolg.maxThemas);
+  if (avond.length < CONFIG.vervolg.minThemas)
+    avond = kandidaten.slice(0, CONFIG.vervolg.minThemas);
+  return { avond: avond, apart: apart };
+}
+
+function bouwRapport(a, club, district) {
+  const datum = new Date().toLocaleDateString("nl-NL",
+    { day: "numeric", month: "long", year: "numeric" });
+  const h = [];
+  let sectie = 0;
+
+  h.push('<h1>Clubcultuurrapport ' + esc(club) + '</h1>');
+  h.push('<p class="sub">District ' + esc(district) + ' &middot; ' + esc(datum) +
+    ' &middot; ' + esc(a.respondenten) + ' reacties' +
+    (a.ledental ? ' van ' + esc(a.ledental) + ' leden (' + a.respons.toFixed(0) + '%)' : '') +
+    '</p>');
+
+  a.waarschuwingen.forEach(w => h.push('<div class="waarschuwing">' + esc(w) + '</div>'));
+
+  h.push('<h2>' + (++sectie) + '. Samenvatting in één oogopslag</h2>');
+  h.push('<table><tr><th>Thema</th><th>Score</th><th>Band</th><th>Laagste item</th></tr>');
+  a.themas.forEach(t => {
+    const laagste = t.items.slice().sort((x, y) => x.gem - y.gem)[0];
+    h.push('<tr><td>' + esc(t.naam) + '</td>' +
+      '<td class="num ' + t.band.sleutel + '">' + fmt(t.gem) + '</td>' +
+      '<td>' + t.band.teken + ' ' + esc(t.band.label) + '</td>' +
+      '<td>' + esc(laagste.kort) + ' (' + fmt(laagste.gem) + ')</td></tr>');
+  });
+  h.push('</table>');
+
+  h.push('<h3>Sterke punten</h3>');
+  if (a.sterktes.length) {
+    h.push('<ul>' + a.sterktes.map(i => '<li><b>' + esc(i.kort) + '</b> — ' + fmt(i.gem) +
+      '. ' + esc(i.tekst) + '</li>').join("") + '</ul>');
+  } else h.push('<p>' + esc(CONFIG.teksten.geenSterktes) + '</p>');
+
+  h.push('<h3>Waar eerst aan werken</h3>');
+  h.push('<table><tr><th>#</th><th>Item</th><th>Score</th><th>Leden ≤ ' +
+    CONFIG.lageScore + '</th></tr>');
+  a.prioriteiten.forEach((i, n) => h.push('<tr><td class="num">' + (n + 1) + '</td>' +
+    '<td>' + esc(i.kort) + '</td>' +
+    '<td class="num ' + band(i.gem).sleutel + '">' + fmt(i.gem) + '</td>' +
+    '<td class="num">' + i.laag + ' van ' + i.n + '</td></tr>'));
+  h.push('</table>');
+
+  h.push('<h2>' + (++sectie) + '. Analyse per thema</h2>');
+  a.themas.forEach(t => {
+    const d = (CONFIG.duiding[t.naam] || {})[t.band.sleutel];
+    h.push('<h3>' + t.band.teken + ' ' + esc(t.naam) + ' &middot; ' + fmt(t.gem) +
+      ' (' + esc(t.band.label) + ')</h3>');
+    h.push('<table><tr><th>Item</th><th>Gem.</th><th>Min</th><th>Max</th><th>≤ ' +
+      CONFIG.lageScore + '</th></tr>');
+    t.items.slice().sort((x, y) => x.gem - y.gem).forEach(i =>
+      h.push('<tr><td>' + esc(i.kort) + '</td>' +
+        '<td class="num ' + band(i.gem).sleutel + '">' + fmt(i.gem) + '</td>' +
+        '<td class="num">' + i.min + '</td><td class="num">' + i.max + '</td>' +
+        '<td class="num">' + i.laag + '</td></tr>'));
+    h.push('</table>');
+    if (d) {
+      h.push('<p class="duiding">' + esc(d.duiding) + '</p>');
+      h.push('<p class="gss"><b>Gedrag</b> ' + esc(d.gedrag) + '</p>');
+      h.push('<p class="gss"><b>Systeem</b> ' + esc(d.systeem) + '</p>');
+      h.push('<p class="gss"><b>Symbool</b> ' + esc(d.symbool) + '</p>');
+    }
+  });
+
+  if (a.citatenTonen && Object.keys(a.open).length) {
+    h.push('<h2>' + (++sectie) + '. Open antwoorden per thema</h2>');
+    h.push('<div class="waarschuwing">' + esc(CONFIG.teksten.citaatInstructie) + '</div>');
+    CONFIG.themas.concat(["Overige open antwoorden"]).forEach(thema => {
+      const blok = a.open[thema];
+      if (!blok) return;
+      h.push('<h3>' + esc(thema) + '</h3>');
+      blok.forEach(v => {
+        h.push('<p><i>' + esc(v.vraag) + '</i></p>');
+        v.antwoorden.slice().sort((x, y) => x.length - y.length || x.localeCompare(y, "nl"))
+          .forEach(t => h.push('<p class="citaat">' + esc(t) + '</p>'));
+      });
+    });
+  }
+
+  /* ── Hoe nu verder ── */
+  const v = vervolgIndeling(a.themas);
+  h.push('<h2>' + (++sectie) + '. Hoe nu verder</h2>');
+  h.push('<p>Dit rapport is het begin van een gesprek, niet de uitkomst ervan. ' +
+    'De commissie Vocational Service heeft daarvoor een beproefd vervolg in drie stappen.</p>');
+
+  CONFIG.vervolg.stappen.forEach(s => {
+    h.push('<h3>' + esc(s.titel) + '</h3>');
+    h.push('<p class="klein" style="margin:0 0 6px">' + esc(s.wie) + '</p>');
+    h.push('<p style="margin-top:0">' + esc(s.tekst) + '</p>');
+  });
+
+  h.push('<h3>Welke thema’s horen op de ledenavond?</h3>');
+  if (v.avond.length) {
+    h.push('<p>Op grond van de scores liggen deze thema’s voor de hand. Het werkblad ' +
+      'van deel 2 werkt met kernwaarden; hieronder staat per thema welke waarde daarbij ' +
+      'past, zodat de subgroepen direct aan de slag kunnen.</p>');
+    h.push('<table><tr><th>Thema</th><th>Score</th><th>Kernwaarde voor de subgroep</th></tr>');
+    v.avond.forEach(t => {
+      const waarden = CONFIG.themaWaarden[t.naam] || [];
+      h.push('<tr><td>' + esc(t.naam) + '</td>' +
+        '<td class="num ' + t.band.sleutel + '">' + fmt(t.gem) + '</td>' +
+        '<td>' + esc(waarden.join(" · ")) + '</td></tr>');
+    });
+    h.push('</table>');
+    h.push('<p class="klein">Kies er twee tot vier. Meer subgroepen dan dat maken de ' +
+      'oogst aan het eind van de avond onoverzichtelijk.</p>');
+  }
+
+  if (v.apart.length) {
+    h.push('<h3>Wat juist niet op de ledenavond hoort</h3>');
+    v.apart.forEach(x => {
+      h.push('<div class="waarschuwing"><b>' + esc(x.thema.naam) + '</b> — ' +
+        fmt(x.thema.gem) + '. ' + esc(x.reden) + '</div>');
+    });
+    h.push('<p>Benoem dit wel aan het begin van de avond, zodat leden weten dat het ' +
+      'onderwerp niet wordt genegeerd maar apart wordt opgepakt. Dat voorkomt dat het ' +
+      'gesprek er alsnog naartoe schuift.</p>');
+  }
+
+  h.push('<h3>Benodigde documenten</h3><ul>');
+  CONFIG.vervolg.documenten.forEach(d =>
+    h.push('<li><b>' + esc(d.naam) + '</b> — ' + esc(d.tekst) + '</li>'));
+  h.push('</ul>');
+  h.push('<p>' + esc(CONFIG.vervolg.slot) + '</p>');
+
+  const g = CONFIG.vervolg.gegevens;
+  h.push('<h3>' + esc(g.kop) + '</h3>');
+  h.push('<p>' + esc(g.inleiding) + '</p>');
+  h.push('<ol>' + g.punten.map(p => '<li style="margin-bottom:6px">' + p + '</li>').join("") +
+    '</ol>');
+  h.push('<p>' + esc(g.slot) + '</p>');
+
+  h.push('<h2>' + (++sectie) + '. Bijlage — alle items</h2>');
+  h.push('<table><tr><th>#</th><th>Vraag</th><th>Thema</th><th>Gem.</th>' +
+    '<th>Min</th><th>Max</th><th>≤ ' + CONFIG.lageScore + '</th><th>n</th></tr>');
+  a.items.forEach(i => h.push('<tr><td class="num">' + i.nr + '</td>' +
+    '<td>' + esc(i.tekst) + '</td><td>' + esc(i.thema) + '</td>' +
+    '<td class="num ' + (i.gem === null ? '' : band(i.gem).sleutel) + '">' + fmt(i.gem) + '</td>' +
+    '<td class="num">' + (i.min === null ? '–' : i.min) + '</td>' +
+    '<td class="num">' + (i.max === null ? '–' : i.max) + '</td>' +
+    '<td class="num">' + i.laag + '</td><td class="num">' + i.n + '</td></tr>'));
+  h.push('</table>');
+
+  h.push('<div class="voet"><p>' + esc(CONFIG.teksten.voorbehoud) + '</p><p>' +
+    esc(CONFIG.attributie) + ' Instrument: ' + esc(CONFIG.instrument) +
+    '. Generator ' + esc(CONFIG.versie) + '. Vragen: ' + esc(CONFIG.contact) + '.</p></div>');
+
+  return h.join("\n");
+}
+
+/* ── Word-export (OOXML, zonder externe bibliotheken) ─────────────────── */
+
+const crcTabel = (function () {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(buf) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) c = crcTabel[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function maakZip(bestanden) {
+  const enc = new TextEncoder(), delen = [], centraal = []; let offset = 0;
+  const w16 = (a, o, v) => { a[o] = v & 255; a[o+1] = (v >>> 8) & 255; };
+  const w32 = (a, o, v) => { a[o] = v & 255; a[o+1] = (v>>>8)&255; a[o+2] = (v>>>16)&255; a[o+3] = (v>>>24)&255; };
+  bestanden.forEach(f => {
+    const naam = enc.encode(f.naam), inhoud = enc.encode(f.inhoud), crc = crc32(inhoud);
+    const kop = new Uint8Array(30 + naam.length);
+    w32(kop, 0, 0x04034b50); w16(kop, 4, 20); w16(kop, 6, 0); w16(kop, 8, 0);
+    w16(kop, 10, 0); w16(kop, 12, 0); w32(kop, 14, crc);
+    w32(kop, 18, inhoud.length); w32(kop, 22, inhoud.length); w16(kop, 26, naam.length);
+    kop.set(naam, 30);
+    delen.push(kop, inhoud);
+    const cd = new Uint8Array(46 + naam.length);
+    w32(cd, 0, 0x02014b50); w16(cd, 4, 20); w16(cd, 6, 20); w16(cd, 8, 0); w16(cd, 10, 0);
+    w32(cd, 16, crc); w32(cd, 20, inhoud.length); w32(cd, 24, inhoud.length);
+    w16(cd, 28, naam.length); w32(cd, 42, offset); cd.set(naam, 46);
+    centraal.push(cd);
+    offset += kop.length + inhoud.length;
+  });
+  const cdLengte = centraal.reduce((a, b) => a + b.length, 0);
+  const eind = new Uint8Array(22);
+  w32(eind, 0, 0x06054b50); w16(eind, 8, bestanden.length); w16(eind, 10, bestanden.length);
+  w32(eind, 12, cdLengte); w32(eind, 16, offset);
+  return new Blob(delen.concat(centraal, [eind]), { type:
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+}
+const xesc = s => String(s).replace(/[&<>]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]));
+
+function htmlNaarWord(container) {
+  const p = [];
+  const alinea = (tekst, opts) => {
+    opts = opts || {};
+    p.push('<w:p><w:pPr><w:spacing w:after="120"/></w:pPr><w:r><w:rPr>' +
+      (opts.vet ? '<w:b/>' : '') +
+      (opts.grootte ? '<w:sz w:val="' + opts.grootte + '"/>' : '') +
+      '</w:rPr><w:t xml:space="preserve">' + xesc(tekst) + '</w:t></w:r></w:p>');
+  };
+  Array.prototype.forEach.call(container.childNodes, n => {
+    if (n.nodeType !== 1) return;
+    const tag = n.tagName.toLowerCase();
+    if (tag === "h1") alinea(n.textContent, { vet: true, grootte: 36 });
+    else if (tag === "h2") alinea(n.textContent, { vet: true, grootte: 28 });
+    else if (tag === "h3") alinea(n.textContent, { vet: true, grootte: 24 });
+    else if (tag === "p" || tag === "div") alinea(n.textContent);
+    else if (tag === "ul")
+      Array.prototype.forEach.call(n.querySelectorAll("li"), li => alinea("• " + li.textContent));
+    else if (tag === "ol")
+      Array.prototype.forEach.call(n.querySelectorAll("li"),
+        (li, i) => alinea((i + 1) + ". " + li.textContent));
+    else if (tag === "table") {
+      const rijen = [];
+      Array.prototype.forEach.call(n.querySelectorAll("tr"), tr => {
+        const cellen = [];
+        Array.prototype.forEach.call(tr.querySelectorAll("th,td"), td => {
+          const kop = td.tagName.toLowerCase() === "th";
+          cellen.push('<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr>' +
+            '<w:p><w:r><w:rPr>' + (kop ? '<w:b/>' : '') +
+            '<w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">' +
+            xesc(td.textContent) + '</w:t></w:r></w:p></w:tc>');
+        });
+        rijen.push('<w:tr>' + cellen.join("") + '</w:tr>');
+      });
+      p.push('<w:tbl><w:tblPr><w:tblBorders>' +
+        ["top","left","bottom","right","insideH","insideV"].map(b =>
+          '<w:' + b + ' w:val="single" w:sz="4" w:color="BFC5CB"/>').join("") +
+        '</w:tblBorders><w:tblW w:w="5000" w:type="pct"/></w:tblPr>' +
+        rijen.join("") + '</w:tbl><w:p/>');
+    }
+  });
+
+  const doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
+    '<w:body>' + p.join("") + '</w:body></w:document>';
+
+  return maakZip([
+    { naam: "[Content_Types].xml", inhoud:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+      '</Types>' },
+    { naam: "_rels/.rels", inhoud:
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
+      '</Relationships>' },
+    { naam: "word/document.xml", inhoud: doc }
+  ]);
+}
+
+/* ── Bediening ────────────────────────────────────────────────────────── */
+
+let csvRijen = null;
+
+function toon(html) { $("meldingen").innerHTML = html; }
+
+function bijwerkStatus() {
+  const club = $("clubnaam").value.trim();
+  const ontbreekt = [];
+  if (!club) ontbreekt.push("de naam van de club");
+  if (!csvRijen) ontbreekt.push("de antwoorden");
+  const klaar = ontbreekt.length === 0;
+  $("genereer").disabled = !klaar;
+  $("status").innerHTML = klaar
+    ? '<span class="gereed">Klaar om te genereren.</span>'
+    : "Nog nodig: " + ontbreekt.join(" en ") + ".";
+}
+
+function neemOver(tekst, waar, meldveld) {
+  if (!tekst || !tekst.trim()) { csvRijen = null; meldveld.innerHTML = ""; bijwerkStatus(); return; }
+  let rijen;
+  try { rijen = parseCSV(tekst); }
+  catch (err) { csvRijen = null; meldveld.innerHTML =
+    '<span style="color:#c0392b">De antwoorden konden niet gelezen worden.</span>';
+    bijwerkStatus(); return; }
+  if (rijen.length < 2) {
+    csvRijen = null;
+    meldveld.innerHTML = '<span style="color:#c0392b">Er zijn wel kolomtitels ' +
+      'gevonden, maar geen antwoorden.</span>';
+  } else {
+    csvRijen = rijen;
+    meldveld.innerHTML = '<span class="gereed">' + esc(waar) + '</span> — ' +
+      (rijen.length - 1) + ' reacties, ' + rijen[0].length + ' kolommen';
+    toon("");
+  }
+  bijwerkStatus();
+}
+
+$("plakveld").addEventListener("input", function () {
+  neemOver(this.value, "Antwoorden geplakt", $("plakmelding"));
+  if (this.value.trim()) $("bestandsnaam").textContent = "Nog geen bestand gekozen";
+});
+
+function verwerkBestand(f) {
+  if (!f) return;
+  if (!/\.csv$/i.test(f.name)) {
+    toon('<div class="fout">Kies een CSV-bestand. Een Excel- of Numbers-bestand moet ' +
+         'eerst worden opgeslagen als CSV — of gebruik de plak-methode hierboven.</div>');
+    return;
+  }
+  const lezer = new FileReader();
+  lezer.onerror = () => toon('<div class="fout">Het bestand kon niet gelezen worden.</div>');
+  lezer.onload = () => {
+    $("plakveld").value = "";
+    $("plakmelding").innerHTML = "";
+    neemOver(lezer.result, f.name, $("bestandsnaam"));
+  };
+  lezer.readAsText(f, "utf-8");
+}
+
+$("bestand").addEventListener("change", e => verwerkBestand(e.target.files[0]));
+$("clubnaam").addEventListener("input", bijwerkStatus);
+
+const dz = $("dropzone");
+["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => {
+  e.preventDefault(); dz.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => {
+  e.preventDefault(); dz.classList.remove("over"); }));
+dz.addEventListener("drop", e => {
+  if (e.dataTransfer.files.length) verwerkBestand(e.dataTransfer.files[0]); });
+
+$("kopieerMail").addEventListener("click", () => {
+  const t = $("mailtekst");
+  t.removeAttribute("readonly"); t.select(); t.setSelectionRange(0, t.value.length);
+  let gelukt = false;
+  try { gelukt = document.execCommand("copy"); } catch (e) { gelukt = false; }
+  t.setAttribute("readonly", "readonly");
+  $("kopieerMelding").textContent = gelukt
+    ? "Gekopieerd — plak de tekst in uw e-mailprogramma."
+    : "De tekst is geselecteerd. Kopieer met Cmd+C (Mac) of Ctrl+C (Windows).";
+});
+
+$("genereer").addEventListener("click", () => {
+  const club = $("clubnaam").value.trim();
+  const district = $("district").value.trim() || "1600";
+  const ledental = parseInt($("ledental").value, 10) || null;
+  if (!club) { toon('<div class="fout">Vul de naam van de club in.</div>'); return; }
+  if (!csvRijen) { toon('<div class="fout">Plak eerst de antwoorden.</div>'); return; }
+
+  const a = analyseer(csvRijen, ledental);
+  if (a.fout) { toon('<div class="fout">' + esc(a.fout) + '</div>'); return; }
+
+  laatste = { a: a, club: club, district: district };
+  $("rapport").innerHTML = bouwRapport(a, club, district);
+  $("acties").classList.remove("verborgen");
+  $("invoer").classList.add("verborgen");
+  window.scrollTo(0, 0);
+});
+
+$("downloadWord").addEventListener("click", () => {
+  if (!laatste) return;
+  const blob = htmlNaarWord($("rapport"));
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Clubcultuurrapport " + laatste.club.replace(/[^\w À-ſ-]/g, "") + ".docx";
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+});
+
+bijwerkStatus();
+</script>
+</body>
+</html>
