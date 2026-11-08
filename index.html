@@ -267,7 +267,7 @@ Met vriendelijke groet,
 const CONFIG = {
 
   versie: "1.0-concept",
-  instrument: "Clubcultuurscan v3 (oktober 2025)",
+  instrument: "Clubcultuurscan v3 (november 2025, 17 stellingen)",
   contact: "[commissie-adres]",
   attributie: "Clubcultuurscan — ontwikkeld door Robert Teunissen voor de Commissie " +
               "Vocational Service, Rotary District 1600. Uitsluitend voor gebruik door Rotaryclubs.",
@@ -294,55 +294,64 @@ const CONFIG = {
     "Kernwaarden-beleving",
     "Leiderschap & besluitvorming",
     "Gelijkheid & inclusie",
-    "Werving, zichtbaarheid & trots",
+    "Werving & zichtbaarheid",
     "Verandering & belemmeringen"
   ],
 
   /* Elk item telt bij precies één thema. */
   items: [
-    { nr:1,  thema:"Veilige verenigingscultuur",     kort:"Veilig kritiek uiten",
-      tekst:"In onze club voelen leden zich veilig om kritiek te uiten." },
-    { nr:2,  thema:"Verandering & belemmeringen",    kort:"Initiatieven positief ontvangen",
-      tekst:"Nieuwe initiatieven worden positief ontvangen, ongeacht wie ze aandraagt." },
-    { nr:3,  thema:"Kernwaarden-beleving",           kort:"Gezelligheid en impact combineren",
+    { nr:1,  thema:"Veilige verenigingscultuur",      kort:"Gehoord en gerespecteerd",
+      tekst:"In onze club voel ik me gehoord en gerespecteerd als ik mijn mening geef." },
+    { nr:2,  thema:"Verandering & belemmeringen",     kort:"Initiatieven open ontvangen",
+      tekst:"Nieuwe initiatieven worden met nieuwsgierigheid en openheid ontvangen, ongeacht wie ze inbrengt." },
+    { nr:3,  thema:"Kernwaarden-beleving",            kort:"Gezelligheid en impact combineren",
       tekst:"We combineren gezelligheid met maatschappelijke impact." },
-    { nr:4,  thema:"Leiderschap & besluitvorming",   kort:"Verbindend leiderschap",
-      tekst:"Leiderschap in onze club is verbindend." },
-    { nr:5,  thema:"Leiderschap & besluitvorming",   kort:"Richtinggevend leiderschap",
-      tekst:"Leiderschap in onze club is richtinggevend." },
-    { nr:6,  thema:"Werving, zichtbaarheid & trots", kort:"Trots op maatschappelijke bijdrage",
+    { nr:4,  thema:"Leiderschap & besluitvorming",    kort:"Verbindend en stimulerend bestuur",
+      tekst:"Ik ervaar het bestuur in onze club als verbindend en stimulerend." },
+    { nr:5,  thema:"Leiderschap & besluitvorming",    kort:"Bestuur geeft richting",
+      tekst:"Het bestuur geeft duidelijk richting aan de club." },
+    { nr:6,  thema:"Kernwaarden-beleving",  kort:"Trots op maatschappelijke bijdrage",
       tekst:"We zijn als club trots op onze bijdrage aan de samenleving." },
-    { nr:7,  thema:"Veilige verenigingscultuur",     kort:"Spanningen open bespreken",
-      tekst:"We bespreken spanningen of conflicten op een open en constructieve manier." },
-    { nr:8,  thema:"Leiderschap & besluitvorming",   kort:"Vertrouwen in het bestuur",
-      tekst:"Ik vertrouw erop dat het bestuur beslissingen neemt in het belang van de hele club." },
-    { nr:9,  thema:"Gelijkheid & inclusie",          kort:"Gelijke kansen om mee te doen",
-      tekst:"Iedereen in onze club krijgt gelijke kansen om mee te doen aan projecten en initiatieven." },
-    { nr:10, thema:"Gelijkheid & inclusie",          kort:"Open en gastvrij",
-      tekst:"Onze club is open en gastvrij voor mensen met verschillende achtergronden, leeftijden en perspectieven." },
-    { nr:11, thema:"Leiderschap & besluitvorming",   kort:"Helderheid over besluitvorming",
-      tekst:"Het is voor mij duidelijk hoe beslissingen binnen het bestuur tot stand komen en gecommuniceerd worden." },
-    { nr:12, thema:"Werving, zichtbaarheid & trots", kort:"Nieuwe leden aandragen",
-      tekst:"De leden van onze club dragen regelmatig potentiële nieuwe leden aan." },
-    { nr:13, thema:"Kernwaarden-beleving",           kort:"Aandacht voor morele dilemma's",
-      tekst:"We besteden voldoende aandacht aan hoe effectief om te gaan met morele dilemma's." },
-    { nr:14, thema:"Werving, zichtbaarheid & trots", kort:"Actief op social media",
-      tekst:"We zijn actief op social media om te laten zien wat onze club bijdraagt aan de samenleving." },
-    { nr:15, thema:"Kernwaarden-beleving",           kort:"Vriendschap en vertrouwen",
-      tekst:"We werken actief aan het bevorderen van vriendschap en vertrouwen binnen de club." },
-    { nr:16, thema:"Verandering & belemmeringen",    kort:"Netwerk willen inzetten",
-      tekst:"We zijn bereid ons netwerk in te zetten als dat gevraagd wordt." }
+    { nr:7,  thema:"Veilige verenigingscultuur",      kort:"Spanningen open bespreken",
+      tekst:"We bespreken spanningen of verschillen op een open en constructieve manier." },
+    { nr:8,  thema:"Leiderschap & besluitvorming",    kort:"Vertrouwen in het bestuur",
+      tekst:"Ik heb vertrouwen dat het bestuur beslissingen neemt in het belang van de hele club." },
+    { nr:9,  thema:"Gelijkheid & inclusie",           kort:"Welkom om mee te doen",
+      tekst:"Ik voel me welkom om mee te doen aan projecten en initiatieven." },
+    { nr:10, thema:"Gelijkheid & inclusie",           kort:"Gastvrij en open",
+      tekst:"Onze club is gastvrij en open voor mensen met verschillende achtergronden, leeftijden en perspectieven." },
+    { nr:11, thema:"Leiderschap & besluitvorming",    kort:"Helderheid over besluitvorming",
+      tekst:"Het is voor mij duidelijk hoe beslissingen tot stand komen en gecommuniceerd worden." },
+    { nr:12, thema:"Werving & zichtbaarheid",  kort:"Nieuwe leden aandragen",
+      tekst:"Leden dragen voldoende nieuwe mensen aan die bij onze club zouden passen." },
+    { nr:13, thema:"Kernwaarden-beleving",            kort:"Reflectie op morele keuzes",
+      tekst:"We nemen voldoende tijd om samen te reflecteren op morele keuzes of dilemma’s in ons werk of projecten." },
+    { nr:14, thema:"Werving & zichtbaarheid",  kort:"Laten zien waar we trots op zijn",
+      tekst:"We laten voldoende zien waar we trots op zijn, binnen en buiten de club (social media, bijeenkomsten, nieuwsbrieven)." },
+    { nr:15, thema:"Veilige verenigingscultuur",            kort:"Onderling vertrouwen",
+      tekst:"Binnen de club ervaar ik onderling vertrouwen (nakomen van afspraken)." },
+    { nr:16, thema:"Verandering & belemmeringen",     kort:"Netwerk en expertise inzetten",
+      tekst:"Leden zijn bereid hun netwerk en expertise in te zetten als dat gevraagd wordt." },
+    { nr:17, thema:"Kernwaarden-beleving",  kort:"Inspirerend verhaal over Rotary",
+      tekst:"Ik kan een inspirerend verhaal over Rotary vertellen aan vrienden en bekenden." }
   ],
 
-  /* Toewijzing van open vragen aan thema's, op trefwoord in de vraagtekst.
-     Geen match: "Overige open antwoorden". Trefwoorden in kleine letters. */
+  /* De twaalf open vragen van v3, elk vast gekoppeld aan een thema.
+     Herkenning gebeurt op woordovereenkomst met onderstaande tekst; een
+     onbekende open vraag belandt in "Overige open antwoorden". */
   openVragen: [
-    { thema:"Veilige verenigingscultuur",     trefwoorden:["veilig","conflict","spanning","kritiek"] },
-    { thema:"Kernwaarden-beleving",           trefwoorden:["waarde","trots","moreel","ethiek","vriendschap"] },
-    { thema:"Leiderschap & besluitvorming",   trefwoorden:["bestuur","besluit","leiderschap","koers"] },
-    { thema:"Gelijkheid & inclusie",          trefwoorden:["inclusie","gelijk","gastvrij","welkom"] },
-    { thema:"Werving, zichtbaarheid & trots", trefwoorden:["werving","zichtbaar","social media","imago","buiten"] },
-    { thema:"Verandering & belemmeringen",    trefwoorden:["verander","belemmer","toekomst","ideaal","verbeter","droom"] }
+    { thema:"Kernwaarden-beleving",  vraag:"Waar ben je het meest trots op in onze club?" },
+    { thema:"Kernwaarden-beleving",            vraag:"Wat betekent het voor jou om Rotary-lid te zijn?" },
+    { thema:"Kernwaarden-beleving",            vraag:"Waardoor voel jij je gewaardeerd binnen de club?" },
+    { thema:"Gelijkheid & inclusie",           vraag:"Wat zou er moeten zijn om je meer verbonden te voelen met de club?" },
+    { thema:"Veilige verenigingscultuur",      vraag:"Wat helpt volgens jou om verschillen van mening beter bespreekbaar te maken?" },
+    { thema:"Gelijkheid & inclusie",           vraag:"Hoe kunnen we nieuwe leden zich welkom laten voelen?" },
+    { thema:"Gelijkheid & inclusie",           vraag:"Wat betekent inclusie of openheid voor jou in de context van onze club?" },
+    { thema:"Kernwaarden-beleving",            vraag:"Welke waarden of overtuigingen vind jij het belangrijkst in ons clubleven?" },
+    { thema:"Leiderschap & besluitvorming",    vraag:"Hoe ervaar jij de rol van het bestuur in het creëren van een positieve sfeer?" },
+    { thema:"Verandering & belemmeringen",     vraag:"Wat zou je willen dat we anders doen of vaker doen om sterker te worden als club?" },
+    { thema:"Werving & zichtbaarheid",  vraag:"Wat vind je belangrijk om zichtbaar te maken wat we bereiken of betekenen voor de samenleving?" },
+    { thema:"Verandering & belemmeringen",     vraag:"Als je één wens hebt voor de toekomst van onze club, wat zou dat zijn?" }
   ],
 
   negeerKolommen: ["tijdstempel","timestamp","datum","score"],
@@ -445,7 +454,7 @@ const CONFIG = {
         symbool:"Nieuwe leden krijgen in hun eerste jaar een zichtbare rol op een clubavond." }
     },
 
-    "Werving, zichtbaarheid & trots": {
+    "Werving & zichtbaarheid": {
       rood: {
         duiding:"De club is intern levendig maar extern vrijwel onzichtbaar. Leden zijn trots op wat er gebeurt, en tegelijk weet vrijwel niemand daarbuiten ervan. Dat kost de club tweemaal: potentiële leden zien geen reden om aan te sluiten, en leden missen de bevestiging dat hun inzet ertoe doet. Dit is een van de best oplosbare thema's — het vraagt vooral organisatie, geen cultuurverandering.",
         gedrag:"Hardop bedanken voor inzet, ook voor kleine taken.",
@@ -511,7 +520,7 @@ const CONFIG = {
     "Kernwaarden-beleving":           ["Vertrouwen"],
     "Leiderschap & besluitvorming":   ["Vertrouwen", "Rechtvaardigheid"],
     "Gelijkheid & inclusie":          ["Respect", "Verbinding"],
-    "Werving, zichtbaarheid & trots": ["Waardering"],
+    "Werving & zichtbaarheid": ["Waardering"],
     "Verandering & belemmeringen":    ["Verbinding", "Moed"]
   },
 
@@ -723,8 +732,12 @@ function analyseer(rijen, ledental) {
     if (CONFIG.emailAanduidingen.some(e => nk.includes(normaliseer(e)))) return;
     const antw = data.map(r => (r[i] || "").trim()).filter(v => v.length > 2);
     if (!antw.length) return;
-    const regel = CONFIG.openVragen.find(o => o.trefwoorden.some(t => nk.includes(t)));
-    const thema = regel ? regel.thema : "Overige open antwoorden";
+    let besteV = null, scoreV = 0;
+    CONFIG.openVragen.forEach(o => {
+      const s = overeenkomst(k, o.vraag);
+      if (s > scoreV) { scoreV = s; besteV = o; }
+    });
+    const thema = (besteV && scoreV >= 0.5) ? besteV.thema : "Overige open antwoorden";
     (open[thema] = open[thema] || []).push({ vraag: k, antwoorden: antw });
   });
 
