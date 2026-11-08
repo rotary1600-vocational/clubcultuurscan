@@ -3,7 +3,7 @@
 Rapportgenerator voor de clubcultuurscan van de Commissie Vocational Service,
 Rotary District 1600.
 
-**Gepubliceerde versie:** https://ORGANISATIE.github.io/clubcultuurscan/
+**Gepubliceerde versie:** https://rotary1600-vocational.github.io/clubcultuurscan/
 
 ## Wat dit is
 
